@@ -26,7 +26,7 @@
 
 ## 用隔離時鐘做遊戲邏輯 smoke check
 
-- **經驗**：對單檔遊戲，可在 Node `vm` 中載入實際 `<script>`，用最小假 DOM、可控的 `performance.now()` 與 `requestAnimationFrame`，快速驗證開始遊戲、PERFECT 得分、MISS、結算等核心流程，不必先搭完整瀏覽器測試架構。
+- **經驗**：對單檔遊戲，可在 Node `vm` 中載入實際 `<script>`，用最小假 DOM、可控的 `performance.now()` 與 `requestAnimationFrame`，快速驗證開始遊戲、PERFECT 得分、MISS、結算等核心流程，不必先搭完整瀏覽器測試架構。本專案將 smoke check 固化在 `tests/smoke.cjs`，用 `npm test` 執行，沒有額外套件依賴。
 - **適用範圍**：依賴少、核心流程以 DOM 事件和時間為主的單頁遊戲原型；適合快速回歸邏輯。
 - **限制**：假 DOM 不會驗證真實 CSS 版面、滑鼠/觸控事件差異、瀏覽器音訊策略或手機可用性。重要互動仍需瀏覽器與實機檢查。
 

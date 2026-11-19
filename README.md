@@ -15,3 +15,7 @@
 ## 發布
 
 GitHub Actions workflow 位於 `.github/workflows/pages.yml`。推送到 `main` 後會把靜態網站部署到 GitHub Pages。首次使用時，需在 GitHub repository 的 **Settings → Pages → Build and deployment** 選擇 **GitHub Actions** 作為來源。
+
+## 執行 smoke check
+
+執行 `npm test` 可在 Node.js 中驗證節拍提示、點擊與鍵盤命中、分數、失誤、結算，以及 HTML 結尾沒有孤立文字。測試不需要額外套件。
