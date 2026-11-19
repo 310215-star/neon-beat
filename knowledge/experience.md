@@ -23,3 +23,9 @@
 - **經驗**：使用官方 `actions/deploy-pages` workflow，透過 upload-pages-artifact 提交網站內容，不需額外建置即可部署根目錄靜態檔。
 - **適用範圍**：純 HTML/CSS/JS 網站與作品展示。
 - **提醒**：repository 首次發布需在 Pages 設定中選擇 GitHub Actions；GitHub Actions 的 Pages 權限需允許 workflow 寫入。
+
+## 用隔離時鐘做遊戲邏輯 smoke check
+
+- **經驗**：對單檔遊戲，可在 Node `vm` 中載入實際 `<script>`，用最小假 DOM、可控的 `performance.now()` 與 `requestAnimationFrame`，快速驗證開始遊戲、PERFECT 得分、MISS、結算等核心流程，不必先搭完整瀏覽器測試架構。
+- **適用範圍**：依賴少、核心流程以 DOM 事件和時間為主的單頁遊戲原型；適合快速回歸邏輯。
+- **限制**：假 DOM 不會驗證真實 CSS 版面、滑鼠/觸控事件差異、瀏覽器音訊策略或手機可用性。重要互動仍需瀏覽器與實機檢查。
