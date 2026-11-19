@@ -29,7 +29,8 @@ jobs:
         with:
           node-version: 24
       - name: Run game smoke tests
-        run: npm test      - name: Configure Pages
+        run: npm test
+      - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v4
