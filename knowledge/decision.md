@@ -4,6 +4,6 @@
 
 ## GitHub repository 命名與可見性
 
-- **狀態**：待實際建立時確認帳號與權限；本機未安裝 GitHub CLI；GitHub 整合目前未連線，已提出連線建議；Git Credential Manager 非互動式查詢也未找到可用憑證。
-- **推薦**：公開 repository，命名為 `neon-beat`，以便透過 GitHub Pages 分享遊戲；若 GitHub 帳號不允許建立公開專案，再記錄並採用可用設定。
-- **影響**：建立 repository 需要已登入的 GitHub 帳號與建立 repository 的權限；這項外部帳號能力目前無法從本機檔案狀態推得。
+- **狀態**：GitHub 帳號 `310215-star` 已透過整合驗證；該帳號下尚無 `neon-beat` repository。GitHub API 工具可存取 repository，但目前沒有建立 repository 的工具。
+- **推薦**：建立公開 repository `310215-star/neon-beat`，以便透過 GitHub Pages 分享遊戲。使用者已授權建立並發布；不需額外產品決策。
+- **後續**：建立 repository 後新增本機 remote，推送 `main`，並設定 Pages 使用 GitHub Actions。
