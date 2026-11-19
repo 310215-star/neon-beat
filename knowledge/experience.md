@@ -47,3 +47,9 @@
 - **經驗**：把無依賴的 `npm test` 放在 Pages 發布 workflow 的部署步驟之前，可在遠端每次部署時先驗證核心流程，讓同一條檢查同時服務本機迭代與發布閘門。
 - **適用範圍**：有快速、穩定 smoke check 的靜態網站；檢查耗時應足夠短，不拖慢部署回饋。
 - **提醒**：假 DOM 的測試不會取代瀏覽器版面、觸控與真實音訊檢查。
+
+## GitHub API 身分與本機 Git 認證分開處理
+
+- **經驗**：GitHub 整合能建立或讀取 repository，不代表本機 Git Credential Manager 已取得 push 權限。本機推送會另行啟動 `Connect to GitHub` 登入流程；需完成該流程後才能驗證 remote push 與 Actions 部署。
+- **適用範圍**：以整合工具管理 GitHub、同時透過本機 Git 推送的開發工作流程。
+- **提醒**：建立 repository 後即刻檢查 `git push` 認證狀態，將 repository 已建立與程式碼已推送分別記錄，避免把兩者誤當成同一步。
