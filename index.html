@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b14">
+  <title>NEON BEAT — 節奏遊戲</title>
+  <style>
+    :root{color-scheme:dark;--bg:#090b14;--panel:#101525;--muted:#929bb7;--cyan:#5df5ff;--pink:#ff55cb;--lime:#d2ff70;--line:#ffffff20}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#24345e 0%,transparent 55%),var(--bg);color:#f4f6ff;font-family:Inter,"Noto Sans TC",system-ui,sans-serif;display:grid;place-items:center;padding:20px}
+    .app{width:min(1040px,100%);display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:20px}.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:2px 4px}.brand{font-weight:900;letter-spacing:.2em;font-size:14px;color:var(--cyan)}.brand span{color:#fff}.tag{color:var(--muted);font-size:12px;letter-spacing:.12em}
+    .game-card,.side{background:linear-gradient(150deg,#151b2dcf,#0e1220f2);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 80px #0007;overflow:hidden}.game-card{position:relative;min-height:620px}.hud{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)}.label{font-size:10px;color:var(--muted);letter-spacing:.18em}.score{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}.combo{color:var(--lime);font-size:13px;font-weight:700;min-width:88px;text-align:right}
+    .stage{height:500px;position:relative;overflow:hidden;touch-action:manipulation;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),#ffffff0c calc(25% - 1px),#ffffff0c 25%),linear-gradient(180deg,#0b1022,#0d1220 75%,#131828)}.stage:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#111b3322,transparent 30%,#0c112acc);pointer-events:none}.lane-glow{position:absolute;inset:0 0 0 0;background:linear-gradient(180deg,transparent 65%,#5df5ff08);pointer-events:none}.hitline{position:absolute;left:0;right:0;bottom:82px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),var(--pink),transparent);box-shadow:0 0 18px #5df5ffaa;z-index:3}.hitline:after{content:"";position:absolute;inset:-8px 0;background:linear-gradient(90deg,transparent,#5df5ff12,#ff55cb12,transparent)}
+    .lane-keys{position:absolute;left:0;right:0;bottom:0;height:72px;display:grid;grid-template-columns:repeat(4,1fr);z-index:4}.lane-key{border:0;border-right:1px solid #ffffff12;background:linear-gradient(180deg,#ffffff05,#ffffff0b);color:#929bb7;cursor:pointer;touch-action:manipulation;font-size:11px;letter-spacing:.12em;transition:background .08s,color .08s,transform .08s}.lane-key:last-child{border-right:0}.lane-key kbd{display:block;margin:0 auto 5px;border:1px solid #ffffff25;border-radius:6px;padding:4px 9px;width:max-content;font:700 12px inherit;color:#fff}.lane-key.active,.lane-key:active{background:linear-gradient(180deg,#5df5ff26,#ff55cb18);color:var(--cyan);transform:translateY(-2px)}
+    .note{position:absolute;width:calc(25% - 18px);height:18px;border-radius:8px;top:0;z-index:2;box-shadow:0 0 15px currentColor,0 0 28px color-mix(in srgb,currentColor 55%,transparent);background:currentColor;border:1px solid #ffffffa6}.note:after{content:"";position:absolute;inset:4px 8px;background:#fff9;border-radius:8px;filter:blur(2px)}.note.l0{color:#5df5ff}.note.l1{color:#b995ff}.note.l2{color:#ff70b7}.note.l3{color:#d2ff70}
+    .feedback{position:absolute;left:0;right:0;top:38%;text-align:center;z-index:5;pointer-events:none;font-weight:900;letter-spacing:.12em;font-size:24px;text-shadow:0 0 18px currentColor;opacity:0;transform:scale(.85);transition:.12s}.feedback.show{opacity:1;transform:scale(1)}.feedback.perfect{color:var(--lime)}.feedback.good{color:var(--cyan)}.feedback.miss{color:#ff7089}.overlay{position:absolute;inset:0;z-index:6;display:grid;place-items:center;background:#080b14b8;backdrop-filter:blur(8px);padding:24px;text-align:center}.overlay.hidden{display:none}.dialog{max-width:390px}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:.24em;font-weight:800}.dialog h1{font-size:clamp(34px,7vw,56px);line-height:.98;margin:12px 0}.dialog p{color:#adb5cd;line-height:1.7;font-size:14px}.button{border:0;border-radius:12px;padding:14px 28px;color:#071016;background:linear-gradient(100deg,var(--cyan),#8affd6);font:800 14px inherit;cursor:pointer;box-shadow:0 8px 24px #5df5ff35}.button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+    .side{padding:22px;display:flex;flex-direction:column;gap:22px}.side h2{font-size:12px;letter-spacing:.16em;margin:0 0 12px;color:#b9c1da}.stat{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #ffffff10;font-size:13px;color:var(--muted)}.stat strong{font-size:15px;color:#f4f6ff;font-variant-numeric:tabular-nums}.progress{height:5px;background:#ffffff12;border-radius:9px;overflow:hidden;margin-top:10px}.progress i{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .2s}.tip{margin-top:auto;padding:15px;border-radius:12px;background:#ffffff08;color:#aeb8d3;font-size:12px;line-height:1.7}.tip b{color:var(--lime)}.controls{display:flex;gap:10px;align-items:center}.iconbtn{margin-left:auto;background:none;border:1px solid var(--line);color:#aab3cc;border-radius:9px;padding:8px 10px;cursor:pointer}.iconbtn:hover{color:#fff;border-color:#ffffff55}.footer{font-size:10px;color:#67708b;letter-spacing:.08em;text-align:center}
+    @media(max-width:760px){body{padding:12px}.app{grid-template-columns:1fr;gap:12px}.topbar{padding:4px}.game-card{min-height:550px}.stage{height:min(64vh,500px);min-height:390px}.side{display:grid;grid-template-columns:1fr 1fr;padding:16px;gap:14px}.side .tip{grid-column:1/-1;margin:0}.side section:last-of-type{grid-column:1/-1}.topbar .tag{font-size:10px}.stat{padding:7px 0}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar"><div class="brand">NEON <span>BEAT</span></div><div class="tag">TAP TO THE RHYTHM · 01</div></header>
+    <section class="game-card" aria-label="節奏遊戲">
+      <div class="hud"><div><div class="label">SCORE</div><div class="score" id="score">000000</div></div><div><div class="label">BEST</div><div class="score" id="best">000000</div></div><div class="combo" id="combo">READY?</div></div>
+      <div class="stage" id="stage" aria-label="四軌音符遊戲區">
+        <div class="lane-glow"></div><div class="feedback" id="feedback" aria-live="polite"></div><div class="hitline"></div>
+        <div class="lane-keys">
+          <button class="lane-key" data-lane="0" aria-label="第 1 軌，按 D"><kbd>D</kbd>CYAN</button><button class="lane-key" data-lane="1" aria-label="第 2 軌，按 F"><kbd>F</kbd>VIOLET</button><button class="lane-key" data-lane="2" aria-label="第 3 軌，按 J"><kbd>J</kbd>PINK</button><button class="lane-key" data-lane="3" aria-label="第 4 軌，按 K"><kbd>K</kbd>LIME</button>
+        </div>
+        <div class="overlay" id="overlay"><div class="dialog"><div class="eyebrow">READY · PLAYER ONE</div><h1>FEEL THE<br>BEAT.</h1><p>跟著節拍，點擊落到底線的音符。<br>使用 D · F · J · K，或直接點擊軌道。</p><button class="button" id="start">開始遊戲</button><p style="font-size:11px;margin-bottom:0">每首歌約 45 秒 · 命中判定 ±150ms</p></div></div>
+      </div>
+    </section>
+    <aside class="side">
+      <section><h2>SESSION</h2><div class="stat"><span>命中</span><strong id="hits">0</strong></div><div class="stat"><span>失誤</span><strong id="misses">0</strong></div><div class="stat"><span>準確率</span><strong id="accuracy">100%</strong></div><div class="progress"><i id="progress"></i></div></section>
+      <section><h2>HOW TO PLAY</h2><div class="stat"><span>完美 PERFECT</span><strong>±65ms</strong></div><div class="stat"><span>良好 GOOD</span><strong>±150ms</strong></div><div class="stat"><span>完美得分</span><strong>+300</strong></div></section>
+      <div class="tip"><b>小提示</b><br>音符碰到底線時按下對應按鍵。連續命中可累積 Combo，失誤會中斷連擊。</div>
+      <div class="controls"><button class="iconbtn" id="sound" aria-label="切換音效">♫ 音效開</button><button class="iconbtn" id="restart">↻ 重來</button></div>
+      <div class="footer">A SMALL RHYTHM GAME · MADE TO PLAY</div>
+    </aside>
+  </main>
+<script>
+(()=>{
+  const stage=document.querySelector('#stage'), overlay=document.querySelector('#overlay'), startBtn=document.querySelector('#start');
+  const scoreEl=document.querySelector('#score'),bestEl=document.querySelector('#best'),comboEl=document.querySelector('#combo'),hitsEl=document.querySelector('#hits'),missesEl=document.querySelector('#misses'),accuracyEl=document.querySelector('#accuracy'),progressEl=document.querySelector('#progress'),feedback=document.querySelector('#feedback');
+  const keys=['d','f','j','k'], colors=[523.25,587.33,659.25,783.99]; let notes=[],running=false,score=0,hits=0,misses=0,combo=0,best=Number(localStorage.getItem('neonbeat-best')||0),startAt=0,lastFrame=0,spawnIndex=0,audio=null,soundOn=true,raf=0;
+  const bpm=112, beat=60000/bpm, duration=45000, hitY=()=>stage.clientHeight-91;
+  bestEl.textContent=fmt(best);
+  function fmt(n){return String(n).padStart(6,'0')}
+  function tone(lane,velocity=.12){if(!soundOn)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=colors[lane];g.gain.setValueAtTime(velocity,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.12);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.13)}catch{}}
+  function feedbackText(text,kind){feedback.textContent=text;feedback.className='feedback show '+kind;clearTimeout(feedback._timer);feedback._timer=setTimeout(()=>feedback.classList.remove('show'),360)}
+  function updateHud(){scoreEl.textContent=fmt(score);hitsEl.textContent=hits;missesEl.textContent=misses;accuracyEl.textContent=(hits+misses?Math.round(hits/(hits+misses)*100):100)+'%';comboEl.textContent=combo>1?combo+' COMBO':(running?'KEEP IT UP':'READY?');bestEl.textContent=fmt(best)}
+  function makeNote(lane,time){const el=document.createElement('div');el.className='note l'+lane;el.style.left=`calc(${lane*25}% + 9px)`;stage.appendChild(el);notes.push({lane,time,el,done:false})}
+  function sequence(){const pattern=[0,2,1,3,0,1,2,3,1,0,3,2,0,2,3,1,2,0,1,3];for(let i=0;i*beat+1800<duration-150;i++){let lane=pattern[i%pattern.length];if(i%8===7)lane=(lane+1+(i%3))%4;makeNote(lane,i*beat+1800)}}
+  function begin(){cancelAnimationFrame(raf);notes.forEach(n=>n.el.remove());notes=[];score=hits=misses=combo=spawnIndex=0;running=true;startAt=performance.now();sequence();overlay.classList.add('hidden');updateHud();lastFrame=0;loop(startAt)}
+  function loop(now){if(!running)return;const elapsed=now-startAt;if(elapsed>=duration){finish();return}progressEl.style.width=(elapsed/duration*100)+'%';for(const n of notes){if(n.done)continue;const delta=n.time-elapsed;const travel=1600;const y=hitY()-(delta/travel)*(hitY()+24);n.el.style.transform=`translateY(${y}px)`;if(delta < -160){n.done=true;n.el.remove();misses++;combo=0;feedbackText('MISS','miss');updateHud()}}raf=requestAnimationFrame(loop)}
+  function press(lane){document.querySelectorAll('.lane-key')[lane].classList.add('active');setTimeout(()=>document.querySelectorAll('.lane-key')[lane].classList.remove('active'),90);if(!running)return;const elapsed=performance.now()-startAt;let nearest=null,dist=Infinity;for(const n of notes){if(n.done||n.lane!==lane)continue;const d=Math.abs(n.time-elapsed);if(d<dist){dist=d;nearest=n}}if(nearest&&dist<=150){nearest.done=true;nearest.el.remove();hits++;combo++;score+=dist<=65?300:150;if(score>best){best=score;localStorage.setItem('neonbeat-best',String(best))}tone(lane,dist<=65?.16:.10);feedbackText(dist<=65?'PERFECT':'GOOD',dist<=65?'perfect':'good');updateHud()}else{tone(lane,.045);feedbackText('空打','miss')}}
+  function finish(){running=false;cancelAnimationFrame(raf);progressEl.style.width='100%';const rank=score>=9000?'S':score>=6500?'A':score>=4000?'B':'C';overlay.innerHTML=`<div class="dialog"><div class="eyebrow">TRACK COMPLETE</div><h1>RANK ${rank}</h1><p>最終分數 <b style="color:#fff">${fmt(score)}</b><br>命中 ${hits} 次 · 失誤 ${misses} 次 · 準確率 ${accuracyEl.textContent}</p><button class="button" id="again">再玩一次</button></div>`;overlay.classList.remove('hidden');document.querySelector('#again').addEventListener('click',begin)}
+  startBtn.addEventListener('click',begin);document.querySelector('#restart').addEventListener('click',()=>{if(running||!overlay.classList.contains('hidden'))begin();else{overlay.classList.remove('hidden')}});document.querySelector('#sound').addEventListener('click',e=>{soundOn=!soundOn;e.currentTarget.textContent=soundOn?'♫ 音效開':'♫ 音效關'});
+  document.querySelectorAll('.lane-key').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();press(+b.dataset.lane)}));window.addEventListener('keydown',e=>{if(e.repeat)return;const lane=keys.indexOf(e.key.toLowerCase());if(lane>=0){e.preventDefault();press(lane)}if(e.key==='Enter'&&!running)begin()});
+  updateHud();
+})();
+</script>
+</body>
+</html>
+
+\n
