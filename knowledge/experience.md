@@ -53,3 +53,9 @@
 - **經驗**：GitHub 整合能建立或讀取 repository，不代表本機 Git Credential Manager 已取得 push 權限。本機推送會另行啟動 `Connect to GitHub` 登入流程；需完成該流程後才能驗證 remote push 與 Actions 部署。
 - **適用範圍**：以整合工具管理 GitHub、同時透過本機 Git 推送的開發工作流程。
 - **提醒**：建立 repository 後即刻檢查 `git push` 認證狀態，將 repository 已建立與程式碼已推送分別記錄，避免把兩者誤當成同一步。
+
+## Pages 首次部署前先啟用網站來源
+
+- **經驗**：workflow 檔案就緒且 smoke tests 通過，不代表 Pages site 已經建立。`actions/configure-pages` 預設只讀取現有 Pages 設定；若 Pages 未啟用，該步會回報 site not found。先把 repository Pages source 設為 GitHub Actions，再重跑 workflow，即可完成發布。本專案重跑成功後用首頁 HTTP 200 與頁面標題驗證上線。
+- **適用範圍**：新建 GitHub repository 後首次以 GitHub Actions 發布 Pages 的專案。
+- **提醒**：不要把 Actions workflow 失敗直接當成程式測試失敗；檢查 job step 和原始錯誤，分清是程式、workflow 語法或 repository Pages 設定。
