@@ -9,7 +9,7 @@
 - 原型已完成，可直接以瀏覽器開啟 `index.html` 遊玩。
 - 核心循環包括四軌音符、112 BPM 節拍提示、鍵盤與觸控輸入、判定視窗、分數、連擊、失誤、準確率、最高分與結算畫面。
 - GitHub Pages workflow 已加入；GitHub repository 尚未建立，尚未發布。本機無 GitHub CLI、remote 或非互動式憑證，GitHub 整合尚未連線。
-- HTML 結構、JavaScript 語法、HTTP 200 與核心流程 smoke check 已通過；瀏覽器視覺、觸控與實機音訊仍待確認。
+- HTML 結構、JavaScript 語法、HTTP 200 與核心流程 smoke check 已通過；headless Chrome 桌機預覽已檢視並移除頁尾孤立字串，手機版、觸控與實機音訊仍待確認。
 
 ## 已完成
 
@@ -22,7 +22,8 @@
 ## 剩餘項目
 
 - [x] 驗證 HTML/JavaScript 結構、本機 HTTP 載入，以及開始、112 BPM 節拍提示、PERFECT、MISS、結算的 Node smoke check。
-- [ ] 在瀏覽器實際試玩，檢查音符位置、鍵盤/觸控判定與手機版版面，修正體驗問題。
+- [x] 檢視 headless Chrome 桌機預覽，移除 HTML 後方誤顯示的字面 `
+`。\n- [ ] 在瀏覽器實際試玩，檢查音符位置、鍵盤/觸控判定與手機版版面，修正體驗問題。
 - [ ] 建立 GitHub repository，設定 `main` 為主要分支並推送程式碼。
 - [ ] 設定 Pages 使用 GitHub Actions，確認首次部署成功並記下網址。
 - [ ] 根據試玩調整音符移動、節奏與回饋，更新經驗文件。
@@ -30,7 +31,7 @@
 ## 路線圖與目前狀態
 
 1. **MVP 遊戲與專案骨架 — 完成**：完成靜態遊戲、README、知識文件與 Pages workflow，通過 JavaScript 語法及 HTML 結構檢查。
-2. **瀏覽器試玩與體驗修整 — 進行中**：節拍提示與遊戲邏輯 smoke check 通過；待確認桌機/手機實際顯示、觸控及真實音訊。
+2. **瀏覽器試玩與體驗修整 — 進行中**：桌機 headless 預覽已檢視並修正孤立文字，節拍提示與遊戲邏輯 smoke check 通過；待確認手機顯示、互動輸入與真實音訊。
 3. **GitHub 建置與公開發布 — 等待連線**：GitHub 整合尚未連線；連線後建立 repository、推送並啟用 Pages。
 4. **發布後迭代 — 待開始**：依據實際使用調整難度、音符模式與可玩性。
 
