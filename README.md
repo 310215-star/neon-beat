@@ -14,7 +14,7 @@
 
 ## 發布
 
-GitHub Actions workflow 位於 `.github/workflows/pages.yml`。推送到 `main` 後會把靜態網站部署到 GitHub Pages。首次使用時，需在 GitHub repository 的 **Settings → Pages → Build and deployment** 選擇 **GitHub Actions** 作為來源。
+GitHub Actions workflow 位於 `.github/workflows/pages.yml`。推送到 `main` 後會先執行 `npm test`，通過後再把靜態網站部署到 GitHub Pages。首次使用時，需在 GitHub repository 的 **Settings → Pages → Build and deployment** 選擇 **GitHub Actions** 作為來源。
 
 ## 執行 smoke check
 
