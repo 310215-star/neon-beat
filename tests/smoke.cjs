@@ -54,6 +54,8 @@ function createGame() {
   let now = 0;
   let nextFrame = null;
   let audioTones = 0;
+  let nextTimer = 0;
+  const timers = new Map();
 
   const selectors = [
     '#stage', '#overlay', '#start', '#score', '#best', '#combo', '#hits', '#misses',
@@ -105,8 +107,12 @@ function createGame() {
     localStorage: { getItem: (key) => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) },
     requestAnimationFrame(callback) { nextFrame = callback; return 1; },
     cancelAnimationFrame() { nextFrame = null; },
-    setTimeout: () => 1,
-    clearTimeout() {},
+    setTimeout(callback, delay = 0) {
+      const id = ++nextTimer;
+      timers.set(id, { callback, due: now + delay });
+      return id;
+    },
+    clearTimeout(id) { timers.delete(id); },
   };
 
   vm.runInNewContext(script, context, { filename: 'index.html:inline-script' });
@@ -116,6 +122,12 @@ function createGame() {
     get audioTones() { return audioTones; },
     start() { elements['#start'].emit('click'); },
     frame(timestamp) {
+      const dueTimers = [...timers.entries()].filter(([, timer]) => timer.due <= timestamp).sort((a, b) => a[1].due - b[1].due);
+      for (const [id, timer] of dueTimers) {
+        timers.delete(id);
+        now = timer.due;
+        timer.callback();
+      }
       now = timestamp;
       const callback = nextFrame;
       nextFrame = null;
@@ -138,9 +150,13 @@ const countInMs = beatMs * 4;
 game.start();
 assert.equal(game.audioTones, 1, 'the first metronome cue should play at track start');
 assert.equal(game.elements['#countdown'].textContent, '4', 'the visual count-in should start at four');
+assert.equal(game.elements['#stage'].classList.contains('beat-flash'), true, 'the hit line should pulse with the first beat');
+game.frame(140);
+assert.equal(game.elements['#stage'].classList.contains('beat-flash'), false, 'the beat pulse should fade before the next beat');
 game.frame(beatMs);
 assert.equal(game.audioTones, 2, 'the metronome should advance with the BPM');
 assert.equal(game.elements['#countdown'].textContent, '3', 'the visual count-in should follow the BPM');
+assert.equal(game.elements['#stage'].classList.contains('beat-flash'), true, 'the hit line should pulse on later beats');
 game.frame(countInMs);
 assert.equal(game.elements['#countdown'].textContent, '');
 assert.equal(game.elements['#countdown'].classList.contains('hidden'), true);
@@ -148,6 +164,18 @@ game.lanes[0].emit('pointerdown');
 assert.equal(game.elements['#score'].textContent, '000300');
 assert.equal(game.elements['#hits'].textContent, 1);
 assert.equal(game.elements['#best'].textContent, '000300');
+
+// The visual beat cue continues when sound is muted.
+const mutedPulseGame = createGame();
+mutedPulseGame.elements['#sound'].emit('click');
+mutedPulseGame.start();
+assert.equal(mutedPulseGame.audioTones, 0);
+assert.equal(mutedPulseGame.elements['#stage'].classList.contains('beat-flash'), true);
+mutedPulseGame.frame(140);
+assert.equal(mutedPulseGame.elements['#stage'].classList.contains('beat-flash'), false);
+mutedPulseGame.frame(beatMs);
+assert.equal(mutedPulseGame.audioTones, 0);
+assert.equal(mutedPulseGame.elements['#stage'].classList.contains('beat-flash'), true);
 
 // Restart, miss the first note, then press the second chart lane with its keyboard key.
 const restartAt = countInMs;
@@ -193,4 +221,4 @@ assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'PAUSED');
 manualPauseGame.key('Escape');
 assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'KEEP IT UP');
 
-console.log('NEON BEAT smoke checks passed: visual/audio count-in, pointer hit, keyboard hit, miss, best score, visibility/manual pause, and finish.');
+console.log('NEON BEAT smoke checks passed: visual/audio count-in and beat pulse, pointer hit, keyboard hit, miss, best score, visibility/manual pause, and finish.');
