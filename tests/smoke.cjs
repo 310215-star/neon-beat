@@ -210,6 +210,18 @@ assert.match(earlyCalibration.elements['#feedback'].textContent, /ON BEAT/);
 const clampedCalibration = createGame({ 'neonbeat-input-offset': '250' });
 assert.equal(clampedCalibration.elements['#offset'].value, '120');
 assert.equal(clampedCalibration.elements['#offset-value'].textContent, '+120ms');
+const lateEdgeCalibration = createGame({ 'neonbeat-input-offset': '-120' });
+lateEdgeCalibration.start();
+lateEdgeCalibration.frame(countInMs + 260);
+lateEdgeCalibration.lanes[0].emit('pointerdown');
+assert.equal(lateEdgeCalibration.elements['#misses'].textContent, 0);
+assert.match(lateEdgeCalibration.elements['#feedback'].textContent, /140ms LATE/);
+const earlyEdgeCalibration = createGame({ 'neonbeat-input-offset': '120' });
+earlyEdgeCalibration.start();
+earlyEdgeCalibration.frame(countInMs - 260);
+earlyEdgeCalibration.lanes[0].emit('pointerdown');
+assert.equal(earlyEdgeCalibration.elements['#misses'].textContent, 0);
+assert.match(earlyEdgeCalibration.elements['#feedback'].textContent, /140ms EARLY/);
 
 // The visual beat cue continues when sound is muted.
 const mutedPulseGame = createGame();
