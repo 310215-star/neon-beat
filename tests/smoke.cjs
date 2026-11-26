@@ -57,7 +57,7 @@ function createGame() {
 
   const selectors = [
     '#stage', '#overlay', '#start', '#score', '#best', '#combo', '#hits', '#misses',
-    '#accuracy', '#progress', '#feedback', '#sound', '#pause', '#resume', '#restart',
+    '#accuracy', '#progress', '#feedback', '#countdown', '#sound', '#pause', '#resume', '#restart',
   ];
   const elements = Object.fromEntries(selectors.map((selector) => [selector, new FakeElement(selector.slice(1))]));
   const lanes = Array.from({ length: 4 }, (_, lane) => {
@@ -137,9 +137,13 @@ const countInMs = beatMs * 4;
 // Starting the track emits a tempo cue, and a lane press on the first note earns PERFECT.
 game.start();
 assert.equal(game.audioTones, 1, 'the first metronome cue should play at track start');
+assert.equal(game.elements['#countdown'].textContent, '4', 'the visual count-in should start at four');
 game.frame(beatMs);
 assert.equal(game.audioTones, 2, 'the metronome should advance with the BPM');
+assert.equal(game.elements['#countdown'].textContent, '3', 'the visual count-in should follow the BPM');
 game.frame(countInMs);
+assert.equal(game.elements['#countdown'].textContent, '');
+assert.equal(game.elements['#countdown'].classList.contains('hidden'), true);
 game.lanes[0].emit('pointerdown');
 assert.equal(game.elements['#score'].textContent, '000300');
 assert.equal(game.elements['#hits'].textContent, 1);
@@ -189,4 +193,4 @@ assert.equal(manualPauseGame.elements['#combo'].textContent, 'PAUSED');
 manualPauseGame.key('Escape');
 assert.equal(manualPauseGame.elements['#combo'].textContent, 'KEEP IT UP');
 
-console.log('NEON BEAT smoke checks passed: metronome, pointer hit, keyboard hit, miss, best score, visibility/manual pause, and finish.');
+console.log('NEON BEAT smoke checks passed: visual/audio count-in, pointer hit, keyboard hit, miss, best score, visibility/manual pause, and finish.');
