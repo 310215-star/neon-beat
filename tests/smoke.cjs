@@ -57,7 +57,7 @@ function createGame() {
 
   const selectors = [
     '#stage', '#overlay', '#start', '#score', '#best', '#combo', '#hits', '#misses',
-    '#accuracy', '#progress', '#feedback', '#countdown', '#sound', '#pause', '#resume', '#restart',
+    '#accuracy', '#progress', '#feedback', '#combo-text', '#countdown', '#sound', '#pause', '#resume', '#restart',
   ];
   const elements = Object.fromEntries(selectors.map((selector) => [selector, new FakeElement(selector.slice(1))]));
   const lanes = Array.from({ length: 4 }, (_, lane) => {
@@ -178,7 +178,7 @@ const manualPauseGame = createGame();
 manualPauseGame.start();
 manualPauseGame.frame(900);
 manualPauseGame.elements['#pause'].emit('click');
-assert.equal(manualPauseGame.elements['#combo'].textContent, 'PAUSED');
+assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'PAUSED');
 manualPauseGame.lanes[0].emit('pointerdown');
 assert.equal(manualPauseGame.elements['#hits'].textContent, 0);
 manualPauseGame.frame(20_000);
@@ -189,8 +189,8 @@ manualPauseGame.lanes[0].emit('pointerdown');
 assert.equal(manualPauseGame.elements['#hits'].textContent, 1);
 assert.equal(manualPauseGame.elements['#misses'].textContent, 0);
 manualPauseGame.key('Escape');
-assert.equal(manualPauseGame.elements['#combo'].textContent, 'PAUSED');
+assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'PAUSED');
 manualPauseGame.key('Escape');
-assert.equal(manualPauseGame.elements['#combo'].textContent, 'KEEP IT UP');
+assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'KEEP IT UP');
 
 console.log('NEON BEAT smoke checks passed: visual/audio count-in, pointer hit, keyboard hit, miss, best score, visibility/manual pause, and finish.');
