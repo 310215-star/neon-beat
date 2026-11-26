@@ -164,6 +164,21 @@ game.lanes[0].emit('pointerdown');
 assert.equal(game.elements['#score'].textContent, '000300');
 assert.equal(game.elements['#hits'].textContent, 1);
 assert.equal(game.elements['#best'].textContent, '000300');
+assert.match(game.elements['#feedback'].textContent, /ON BEAT/);
+
+// Hit feedback reports the signed timing offset for early and late presses.
+const earlyGame = createGame();
+earlyGame.start();
+earlyGame.frame(countInMs - 30);
+earlyGame.lanes[0].emit('pointerdown');
+assert.match(earlyGame.elements['#feedback'].textContent, /30ms EARLY/);
+
+const lateGame = createGame();
+lateGame.start();
+lateGame.frame(countInMs + 90);
+lateGame.lanes[0].emit('pointerdown');
+assert.match(lateGame.elements['#feedback'].textContent, /90ms LATE/);
+assert.match(lateGame.elements['#feedback'].textContent, /^GOOD/);
 
 // The visual beat cue continues when sound is muted.
 const mutedPulseGame = createGame();
@@ -221,4 +236,4 @@ assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'PAUSED');
 manualPauseGame.key('Escape');
 assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'KEEP IT UP');
 
-console.log('NEON BEAT smoke checks passed: visual/audio count-in and beat pulse, pointer hit, keyboard hit, miss, best score, visibility/manual pause, and finish.');
+console.log('NEON BEAT smoke checks passed: count-in, beat pulse, early/late offsets, pointer/keyboard hits, miss, best score, pause, and finish.');
