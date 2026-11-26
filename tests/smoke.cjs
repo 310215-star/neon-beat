@@ -15,6 +15,7 @@ class FakeElement {
     this.id = id;
     this.textContent = '';
     this.innerHTML = '';
+    this.value = '';
     this.style = {};
     this.dataset = {};
     this.listeners = new Map();
@@ -50,7 +51,7 @@ class FakeElement {
   }
 }
 
-function createGame() {
+function createGame(initialStorage = {}) {
   let now = 0;
   let nextFrame = null;
   let audioTones = 0;
@@ -59,7 +60,7 @@ function createGame() {
 
   const selectors = [
     '#stage', '#overlay', '#start', '#score', '#best', '#combo', '#hits', '#misses',
-    '#accuracy', '#progress', '#feedback', '#combo-text', '#countdown', '#sound', '#pause', '#resume', '#restart',
+    '#accuracy', '#progress', '#feedback', '#combo-text', '#countdown', '#sound', '#pause', '#resume', '#restart', '#offset', '#offset-value',
   ];
   const elements = Object.fromEntries(selectors.map((selector) => [selector, new FakeElement(selector.slice(1))]));
   const lanes = Array.from({ length: 4 }, (_, lane) => {
@@ -99,7 +100,7 @@ function createGame() {
       }
     },
   };
-  const storage = new Map();
+  const storage = new Map(Object.entries(initialStorage));
   const context = {
     document,
     window,
@@ -119,6 +120,7 @@ function createGame() {
   return {
     elements,
     lanes,
+    storage,
     get audioTones() { return audioTones; },
     start() { elements['#start'].emit('click'); },
     frame(timestamp) {
@@ -180,6 +182,29 @@ lateGame.lanes[0].emit('pointerdown');
 assert.match(lateGame.elements['#feedback'].textContent, /90ms LATE/);
 assert.match(lateGame.elements['#feedback'].textContent, /^GOOD/);
 
+// Input calibration is per-browser, defaults to neutral, and shifts judgment in the documented direction.
+const calibratedGame = createGame();
+assert.equal(calibratedGame.elements['#offset'].value, '0');
+assert.equal(calibratedGame.elements['#offset-value'].textContent, '0ms');
+calibratedGame.elements['#offset'].value = '-30';
+calibratedGame.elements['#offset'].emit('input');
+assert.equal(calibratedGame.storage.get('neonbeat-input-offset'), '-30');
+calibratedGame.start();
+calibratedGame.frame(countInMs + 30);
+calibratedGame.lanes[0].emit('pointerdown');
+assert.match(calibratedGame.elements['#feedback'].textContent, /ON BEAT/);
+const reloadedCalibration = createGame({ 'neonbeat-input-offset': '-30' });
+assert.equal(reloadedCalibration.elements['#offset'].value, '-30');
+assert.equal(reloadedCalibration.elements['#offset-value'].textContent, '-30ms');
+const earlyCalibration = createGame({ 'neonbeat-input-offset': '20' });
+earlyCalibration.start();
+earlyCalibration.frame(countInMs - 20);
+earlyCalibration.lanes[0].emit('pointerdown');
+assert.match(earlyCalibration.elements['#feedback'].textContent, /ON BEAT/);
+const clampedCalibration = createGame({ 'neonbeat-input-offset': '250' });
+assert.equal(clampedCalibration.elements['#offset'].value, '120');
+assert.equal(clampedCalibration.elements['#offset-value'].textContent, '+120ms');
+
 // The visual beat cue continues when sound is muted.
 const mutedPulseGame = createGame();
 mutedPulseGame.elements['#sound'].emit('click');
@@ -236,4 +261,4 @@ assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'PAUSED');
 manualPauseGame.key('Escape');
 assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'KEEP IT UP');
 
-console.log('NEON BEAT smoke checks passed: count-in, beat pulse, early/late offsets, pointer/keyboard hits, miss, best score, pause, and finish.');
+console.log('NEON BEAT smoke checks passed: count-in, beat pulse, early/late offsets, input calibration, pointer/keyboard hits, miss, best score, pause, and finish.');
