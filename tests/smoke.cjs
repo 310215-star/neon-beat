@@ -57,7 +57,7 @@ function createGame() {
 
   const selectors = [
     '#stage', '#overlay', '#start', '#score', '#best', '#combo', '#hits', '#misses',
-    '#accuracy', '#progress', '#feedback', '#sound', '#restart',
+    '#accuracy', '#progress', '#feedback', '#sound', '#pause', '#resume', '#restart',
   ];
   const elements = Object.fromEntries(selectors.map((selector) => [selector, new FakeElement(selector.slice(1))]));
   const lanes = Array.from({ length: 4 }, (_, lane) => {
@@ -169,4 +169,24 @@ visibilityGame.lanes[0].emit('pointerdown');
 assert.equal(visibilityGame.elements['#hits'].textContent, 1);
 assert.equal(visibilityGame.elements['#misses'].textContent, 0);
 
-console.log('NEON BEAT smoke checks passed: metronome, pointer hit, keyboard hit, miss, best score, visibility pause, and finish.');
+// Manual pause and Escape resume preserve the chart position as well.
+const manualPauseGame = createGame();
+manualPauseGame.start();
+manualPauseGame.frame(900);
+manualPauseGame.elements['#pause'].emit('click');
+assert.equal(manualPauseGame.elements['#combo'].textContent, 'PAUSED');
+manualPauseGame.lanes[0].emit('pointerdown');
+assert.equal(manualPauseGame.elements['#hits'].textContent, 0);
+manualPauseGame.frame(20_000);
+assert.equal(manualPauseGame.elements['#misses'].textContent, 0);
+manualPauseGame.elements['#resume'].emit('click');
+manualPauseGame.frame(20_000 + countInMs - 900);
+manualPauseGame.lanes[0].emit('pointerdown');
+assert.equal(manualPauseGame.elements['#hits'].textContent, 1);
+assert.equal(manualPauseGame.elements['#misses'].textContent, 0);
+manualPauseGame.key('Escape');
+assert.equal(manualPauseGame.elements['#combo'].textContent, 'PAUSED');
+manualPauseGame.key('Escape');
+assert.equal(manualPauseGame.elements['#combo'].textContent, 'KEEP IT UP');
+
+console.log('NEON BEAT smoke checks passed: metronome, pointer hit, keyboard hit, miss, best score, visibility/manual pause, and finish.');
