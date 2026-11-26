@@ -60,7 +60,7 @@ function createGame(initialStorage = {}) {
 
   const selectors = [
     '#stage', '#overlay', '#start', '#score', '#best', '#combo', '#hits', '#misses',
-    '#accuracy', '#progress', '#feedback', '#combo-text', '#countdown', '#sound', '#pause', '#resume', '#restart', '#offset', '#offset-value',
+    '#accuracy', '#progress', '#feedback', '#combo-text', '#countdown', '#sound', '#pause', '#resume', '#restart', '#offset', '#offset-value', '#offset-reset',
   ];
   const elements = Object.fromEntries(selectors.map((selector) => [selector, new FakeElement(selector.slice(1))]));
   const lanes = Array.from({ length: 4 }, (_, lane) => {
@@ -189,6 +189,12 @@ assert.equal(calibratedGame.elements['#offset-value'].textContent, '0ms');
 calibratedGame.elements['#offset'].value = '-30';
 calibratedGame.elements['#offset'].emit('input');
 assert.equal(calibratedGame.storage.get('neonbeat-input-offset'), '-30');
+calibratedGame.elements['#offset-reset'].emit('click');
+assert.equal(calibratedGame.elements['#offset'].value, '0');
+assert.equal(calibratedGame.elements['#offset-value'].textContent, '0ms');
+assert.equal(calibratedGame.storage.get('neonbeat-input-offset'), '0');
+calibratedGame.elements['#offset'].value = '-30';
+calibratedGame.elements['#offset'].emit('input');
 calibratedGame.start();
 calibratedGame.frame(countInMs + 30);
 calibratedGame.lanes[0].emit('pointerdown');
@@ -261,4 +267,4 @@ assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'PAUSED');
 manualPauseGame.key('Escape');
 assert.equal(manualPauseGame.elements['#combo-text'].textContent, 'KEEP IT UP');
 
-console.log('NEON BEAT smoke checks passed: count-in, beat pulse, early/late offsets, input calibration, pointer/keyboard hits, miss, best score, pause, and finish.');
+console.log('NEON BEAT smoke checks passed: count-in, beat pulse, early/late offsets, input calibration/reset, pointer/keyboard hits, miss, best score, pause, and finish.');
