@@ -66,10 +66,20 @@ function createGame() {
     return button;
   });
   const document = {
+    hidden: false,
+    addEventListener(type, listener) {
+      const listeners = documentListeners.get(type) ?? [];
+      listeners.push(listener);
+      documentListeners.set(type, listeners);
+    },
+    emit(type, event = {}) {
+      for (const listener of documentListeners.get(type) ?? []) listener(event);
+    },
     querySelector: (selector) => elements[selector] ?? (selector === '#again' ? new FakeElement('again') : null),
     querySelectorAll: (selector) => selector === '.lane-key' ? lanes : [],
     createElement: () => new FakeElement(),
   };
+  const documentListeners = new Map();
   const windowListeners = new Map();
   const window = {
     addEventListener(type, listener) { windowListeners.set(type, listener); },
@@ -111,6 +121,11 @@ function createGame() {
       nextFrame = null;
       callback?.(timestamp);
     },
+    visibility(hidden, timestamp) {
+      now = timestamp;
+      document.hidden = hidden;
+      document.emit('visibilitychange');
+    },
     key(key) { window.emit('keydown', { key, repeat: false, preventDefault() {} }); },
   };
 }
@@ -140,4 +155,18 @@ game.key('j');
 assert.equal(game.elements['#score'].textContent, '000300');
 assert.equal(game.elements['#hits'].textContent, 1);
 game.frame(restartAt + 45_001);assert.match(game.elements['#overlay'].innerHTML, /TRACK COMPLETE/);
-console.log('NEON BEAT smoke checks passed: metronome, pointer hit, keyboard hit, miss, best score, and finish.');
+
+// Time spent in a hidden tab is excluded, so returning does not cause a burst of misses.
+const visibilityGame = createGame();
+visibilityGame.start();
+visibilityGame.frame(800);
+visibilityGame.visibility(true, 800);
+visibilityGame.frame(20_000);
+assert.equal(visibilityGame.elements['#misses'].textContent, 0);
+visibilityGame.visibility(false, 20_000);
+visibilityGame.frame(20_000 + countInMs - 800);
+visibilityGame.lanes[0].emit('pointerdown');
+assert.equal(visibilityGame.elements['#hits'].textContent, 1);
+assert.equal(visibilityGame.elements['#misses'].textContent, 0);
+
+console.log('NEON BEAT smoke checks passed: metronome, pointer hit, keyboard hit, miss, best score, visibility pause, and finish.');

@@ -59,3 +59,9 @@
 - **經驗**：workflow 檔案就緒且 smoke tests 通過，不代表 Pages site 已經建立。`actions/configure-pages` 預設只讀取現有 Pages 設定；若 Pages 未啟用，該步會回報 site not found。先把 repository Pages source 設為 GitHub Actions，再重跑 workflow，即可完成發布。本專案重跑成功後用首頁 HTTP 200 與頁面標題驗證上線。
 - **適用範圍**：新建 GitHub repository 後首次以 GitHub Actions 發布 Pages 的專案。
 - **提醒**：不要把 Actions workflow 失敗直接當成程式測試失敗；檢查 job step 和原始錯誤，分清是程式、workflow 語法或 repository Pages 設定。
+
+## 背景分頁期間凍結互動遊戲時鐘
+
+- **經驗**：以 `visibilitychange` 偵測頁面進入背景時暫停動畫迴圈；回到前景時，將暫停時間加回遊戲起始時間，讓譜面與判定時鐘從原進度繼續，避免瀏覽器節流後一次補算大量失誤。使用可控時鐘的 smoke check 驗證長時間隱藏後仍能接續命中。
+- **適用範圍**：以 `performance.now()` 和 `requestAnimationFrame` 驅動、切換分頁或切換 App 後仍應保留進度的即時互動頁面與遊戲。
+- **提醒**：`visibilitychange` 可驗證頁面前景/背景切換，但不能代替實機確認觸控、音訊中斷與裝置輸入延遲；恢復播放聲音時仍需遵守瀏覽器的音訊啟動規則。
