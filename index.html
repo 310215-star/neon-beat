@@ -47,11 +47,12 @@
   </main>
 <script>
 (()=>{
-  const stage=document.querySelector('#stage'), overlay=document.querySelector('#overlay'), startBtn=document.querySelector('#start');
+  const stage=document.querySelector('#stage'), overlay=document.querySelector('#overlay'), startBtn=document.querySelector('#start'),soundBtn=document.querySelector('#sound');
   const scoreEl=document.querySelector('#score'),bestEl=document.querySelector('#best'),comboTextEl=document.querySelector('#combo-text'),hitsEl=document.querySelector('#hits'),missesEl=document.querySelector('#misses'),accuracyEl=document.querySelector('#accuracy'),progressEl=document.querySelector('#progress'),feedback=document.querySelector('#feedback'),countdownEl=document.querySelector('#countdown'),pauseBtn=document.querySelector('#pause'),offsetInput=document.querySelector('#offset'),offsetValue=document.querySelector('#offset-value'),offsetReset=document.querySelector('#offset-reset');
-  const keys=['d','f','j','k'], colors=[523.25,587.33,659.25,783.99]; let notes=[],running=false,score=0,hits=0,misses=0,combo=0,best=Number(localStorage.getItem('neonbeat-best')||0),startAt=0,lastBeat=-1,audio=null,soundOn=true,raf=0,pausedAt=null,pauseReason=null,inputOffset=clampInputOffset(Number(localStorage.getItem('neonbeat-input-offset')));
+  const keys=['d','f','j','k'], colors=[523.25,587.33,659.25,783.99]; let notes=[],running=false,score=0,hits=0,misses=0,combo=0,best=Number(localStorage.getItem('neonbeat-best')||0),startAt=0,lastBeat=-1,audio=null,soundOn=localStorage.getItem('neonbeat-sound')!=='off',raf=0,pausedAt=null,pauseReason=null,inputOffset=clampInputOffset(Number(localStorage.getItem('neonbeat-input-offset')));
   const bpm=112, beat=60000/bpm, countIn=4*beat, duration=45000, hitY=()=>stage.clientHeight-91;
   bestEl.textContent=fmt(best);
+  soundBtn.textContent=soundOn?'♫ 音效開':'♫ 音效關';
   offsetInput.value=String(inputOffset);offsetValue.textContent=formatOffset(inputOffset);
   function fmt(n){return String(n).padStart(6,'0')}
   function clampInputOffset(value){return Number.isFinite(value)?Math.max(-120,Math.min(120,Math.round(value/5)*5)):0}
@@ -71,7 +72,7 @@
   function finish(){running=false;cancelAnimationFrame(raf);pauseBtn.disabled=true;progressEl.style.width='100%';const rank=score>=9000?'S':score>=6500?'A':score>=4000?'B':'C';overlay.innerHTML=`<div class="dialog"><div class="eyebrow">TRACK COMPLETE</div><h1>RANK ${rank}</h1><p>最終分數 <b style="color:#fff">${fmt(score)}</b><br>命中 ${hits} 次 · 失誤 ${misses} 次 · 準確率 ${accuracyEl.textContent}</p><button class="button" id="again">再玩一次</button></div>`;overlay.classList.remove('hidden');document.querySelector('#again').addEventListener('click',begin)}
   document.addEventListener('visibilitychange',()=>{if(!running)return;if(document.hidden)pauseGame('visibility');else if(pauseReason==='visibility')resumeGame()});
   pauseBtn.addEventListener('click',()=>{if(pausedAt!==null){if(pauseReason==='manual')resumeGame()}else pauseGame()});
-  startBtn.addEventListener('click',begin);document.querySelector('#restart').addEventListener('click',()=>{if(running||!overlay.classList.contains('hidden'))begin();else{overlay.classList.remove('hidden')}});document.querySelector('#sound').addEventListener('click',e=>{soundOn=!soundOn;e.currentTarget.textContent=soundOn?'♫ 音效開':'♫ 音效關'});
+  startBtn.addEventListener('click',begin);document.querySelector('#restart').addEventListener('click',()=>{if(running||!overlay.classList.contains('hidden'))begin();else{overlay.classList.remove('hidden')}});soundBtn.addEventListener('click',()=>{soundOn=!soundOn;soundBtn.textContent=soundOn?'♫ 音效開':'♫ 音效關';localStorage.setItem('neonbeat-sound',soundOn?'on':'off')});
   offsetInput.addEventListener('input',()=>{inputOffset=clampInputOffset(Number(offsetInput.value));offsetInput.value=String(inputOffset);offsetValue.textContent=formatOffset(inputOffset);localStorage.setItem('neonbeat-input-offset',String(inputOffset))});
   offsetReset.addEventListener('click',()=>{inputOffset=0;offsetInput.value='0';offsetValue.textContent=formatOffset(0);localStorage.setItem('neonbeat-input-offset','0')});
   document.querySelectorAll('.lane-key').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();press(+b.dataset.lane)}));window.addEventListener('keydown',e=>{if(e.repeat)return;if(e.key==='Escape'&&running){if(pausedAt!==null){if(pauseReason==='manual')resumeGame()}else pauseGame();return}const lane=keys.indexOf(e.key.toLowerCase());if(lane>=0){e.preventDefault();press(lane)}if(e.key==='Enter'&&!running)begin()});
